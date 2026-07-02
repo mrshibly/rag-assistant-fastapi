@@ -7,7 +7,7 @@ flowchart TD
     subgraph Ingestion["Document Ingestion"]
         A["User uploads PDF/TXT/MD"] --> B["Load document"]
         B --> C["Split into chunks"]
-        C --> D["Generate embeddings<br/>(sentence-transformers)"]
+        C --> D["Generate embeddings<br/>(fastembed)"]
         D --> E["Store in ChromaDB"]
     end
 

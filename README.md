@@ -25,7 +25,7 @@ A mini AI assistant built with FastAPI that supports knowledge ingestion, RAG-ba
 |-----------|-----------|-----------|
 | Framework | FastAPI | Required by task; async-first, auto-generated docs |
 | LLM | Groq (llama-3.3-70b-versatile) | Fast inference, free tier, strong tool-calling ability |
-| Embeddings | sentence-transformers (all-MiniLM-L6-v2) | Local execution — no extra API key, fast, good quality |
+| Embeddings | fastembed (BAAI/bge-small-en-v1.5) | Local execution — ONNX quantized model, extremely fast, no PyTorch dependency |
 | Vector DB | ChromaDB | Zero-config, persistent, pip-installable; simpler than FAISS for this scope |
 | Chunking | langchain-text-splitters | Battle-tested `RecursiveCharacterTextSplitter` |
 
@@ -127,8 +127,8 @@ Groq provides extremely fast inference (sub-second responses) with a generous fr
 ### Why ChromaDB over FAISS?
 ChromaDB is a higher-level abstraction that handles persistence, metadata filtering, and collection management out of the box. FAISS requires manual serialization, ID management, and metadata tracking. For this scope, ChromaDB reduces boilerplate while providing the same cosine similarity search.
 
-### Why local embeddings (sentence-transformers) instead of API-based?
-Using `all-MiniLM-L6-v2` locally means only ONE API key is needed (Groq). The model is small (~80MB), loads in seconds, and produces 384-dimensional embeddings — more than sufficient for document retrieval at this scale.
+### Why local embeddings (fastembed) instead of API-based or PyTorch-based?
+Using `fastembed` with `BAAI/bge-small-en-v1.5` locally means only ONE API key is needed (Groq). Unlike `sentence-transformers`, `fastembed` runs the model using ONNX Runtime. This completely avoids downloading the heavy PyTorch library (~2.6GB), reducing the Docker image footprint from 3.5GB+ to just ~350MB, while running inference in milliseconds. BGE-small is also highly accurate, ranking high on the MTEB leaderboard.
 
 ### Why in-memory session storage?
 For a take-home assignment, in-memory `dict[session_id → messages]` is the right trade-off between simplicity and functionality. A production system would use Redis or a database, but that adds infrastructure complexity without demonstrating additional AI pipeline knowledge.
@@ -154,7 +154,7 @@ This priority ordering prevents the LLM from "hallucinating" answers from retrie
 1. User uploads a PDF, TXT, or Markdown file via `POST /api/v1/ingest`.
 2. The document is loaded (PyPDF2 for PDF, plain read for TXT/MD).
 3. Text is split into chunks using `RecursiveCharacterTextSplitter` (500 chars, 50 overlap).
-4. Each chunk is embedded using `all-MiniLM-L6-v2`.
+4. Each chunk is embedded using `BAAI/bge-small-en-v1.5` via `fastembed`.
 5. Embeddings and chunks are stored in ChromaDB with source metadata.
 
 ### Retrieval Approach
