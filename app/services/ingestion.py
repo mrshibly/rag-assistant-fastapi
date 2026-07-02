@@ -4,11 +4,11 @@ from pathlib import Path
 import chromadb
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from PyPDF2 import PdfReader
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
 from app.config import settings
 
-_embedder = SentenceTransformer(settings.EMBEDDING_MODEL)
+_embedder = TextEmbedding(model_name=settings.EMBEDDING_MODEL)
 _chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PERSIST_DIR)
 _collection = _chroma_client.get_or_create_collection(
     name="knowledge_base",
@@ -47,7 +47,7 @@ async def ingest_file(filename: str, content: bytes) -> int:
     if not chunks:
         return 0
 
-    embeddings = _embedder.encode(chunks).tolist()
+    embeddings = [e.tolist() for e in _embedder.embed(chunks)]
     ids = [f"{filename}_{i}" for i in range(len(chunks))]
 
     _collection.upsert(
