@@ -12,5 +12,14 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
+    from pydantic import model_validator
+
+    @model_validator(mode="after")
+    def sanitize_model_name(self) -> "Settings":
+        if self.EMBEDDING_MODEL == "all-MiniLM-L6-v2":
+            self.EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+        return self
+
+
 
 settings = Settings()
