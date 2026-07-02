@@ -43,7 +43,7 @@ flowchart TD
 
     F --> G
     F --> H
-    DB -.-->|Similarity Search| H
+    DB -->|Similarity Search| H
 
     subgraph LLMOrchestration["AI Pipeline Orchestrator (llm.py)"]
         I["4. Compile Messages<br/>(System Prompt + History + Context + Query)"]:::llm
