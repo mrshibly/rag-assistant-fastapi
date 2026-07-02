@@ -1,6 +1,10 @@
 # Mini AI Assistant
 
+[![Live API Docs](https://img.shields.io/badge/API-Live_Docs-blue?style=for-the-badge&logo=fastapi)](https://rag-assistant-fastapi.onrender.com/docs)
+[![Live Health Check](https://img.shields.io/badge/API-Health_Check-green?style=for-the-badge&logo=statuspage)](https://rag-assistant-fastapi.onrender.com/health)
+
 A mini AI assistant built with FastAPI that supports knowledge ingestion, RAG-based chat, session context memory, and tool calling.
+
 
 ## Features
 
